@@ -1,0 +1,522 @@
+openapi: 3.0.1
+info:
+  contact:
+    email: dom.selvon@e2x.com
+  description: Catalog service for E2X kata bootstrap.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: https://kata.e2x.com/terms/
+  title: Catalog
+  version: 1.0.0
+  x-kata-implementations:
+  - generic:
+    - location: service/catalog
+      icon: catalog
+  - commercetools:
+    - location: applydigital/kata-catalog-service
+      icon: commercetools_logo
+  - magento:
+    - location: kata-service/magentocatalog
+      icon: magento_logo
+  - bigcommerce:
+    - location: kata-service/bigc-catalog
+      icon: bigcommerce_logo
+  x-kata-commercetools: true
+  x-kata-containerised: true
+  x-kata-environment-name: demo
+  x-kata-kubernetes-secrets: true
+externalDocs:
+  description: Find out more about Kata Bootstrap
+  url: https://kata.e2x.com
+servers:
+- url: http://localhost:8083/v1
+tags:
+- description: Everything about your catalogs
+  name: catalog
+- description: Everything about your categories
+  name: category
+- description: Everything about your products
+  name: product
+paths:
+  /catalog:
+    get:
+      description: Returns all the catalogs
+      operationId: getCatalogs
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CatalogList'
+          description: Success
+      summary: Retrieve all catalogs
+      tags:
+      - catalog
+      x-accepts: application/json
+      x-tags:
+      - tag: catalog
+  /catalog/{catalogId}:
+    get:
+      description: Returns a single catalog
+      operationId: getCatalogById
+      parameters:
+      - description: ID of catalog to return
+        explode: false
+        in: path
+        name: catalogId
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Catalog'
+          description: successful operation
+        "400":
+          description: Invalid ID supplied
+        "404":
+          description: Catalog not found
+      summary: Find catalog by ID
+      tags:
+      - catalog
+      x-accepts: application/json
+      x-tags:
+      - tag: catalog
+  /category/{seoSlug}:
+    get:
+      description: Returns a single category
+      operationId: getCategoryBySlug
+      parameters:
+      - description: seoSlug of category to return
+        explode: false
+        in: path
+        name: seoSlug
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Category'
+          description: successful operation
+        "400":
+          description: Invalid seoSlug supplied
+        "404":
+          description: Category not found
+      summary: Find category by looking up the SEO Slug
+      tags:
+      - category
+      x-accepts: application/json
+      x-tags:
+      - tag: category
+  /category:
+    get:
+      description: Returns the root categories
+      operationId: getRootCategories
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CategoryList'
+          description: successful operation
+        "400":
+          description: Invalid ID supplied
+        "404":
+          description: Category not found
+      summary: Find the root categories
+      tags:
+      - category
+      x-accepts: application/json
+      x-tags:
+      - tag: category
+  /product/{productKey}:
+    get:
+      description: Returns a single product
+      operationId: getProductByKey
+      parameters:
+      - description: Key of product to return
+        explode: false
+        in: path
+        name: productKey
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+          description: successful operation
+        "400":
+          description: Invalid Key supplied
+        "404":
+          description: Product not found
+      summary: Find product by Key
+      tags:
+      - product
+      x-accepts: application/json
+      x-tags:
+      - tag: product
+components:
+  schemas:
+    Catalog:
+      example:
+        catalogId: catalogId
+        name: name
+        rootCategories: []
+      properties:
+        catalogId:
+          type: string
+        name:
+          type: string
+        rootCategories:
+          example: []
+          items:
+            $ref: '#/components/schemas/Category'
+          type: array
+      type: object
+    CatalogList:
+      example:
+        catalogs: []
+      properties:
+        catalogs:
+          example: []
+          items:
+            $ref: '#/components/schemas/Catalog'
+          type: array
+      type: object
+    Category:
+      example:
+        catalog:
+          catalogId: catalogId
+          name: name
+          rootCategories: []
+        name: name
+        parentCategory: null
+        rootCategory: null
+        categoryId: categoryId
+        key: key
+        slug: slug
+        subCategories:
+          categories: []
+        products:
+          products: []
+      properties:
+        categoryId:
+          type: string
+        key:
+          type: string
+        name:
+          type: string
+        slug:
+          type: string
+        parentCategory:
+          $ref: '#/components/schemas/Category'
+        rootCategory:
+          $ref: '#/components/schemas/Category'
+        catalog:
+          $ref: '#/components/schemas/Catalog'
+        subCategories:
+          $ref: '#/components/schemas/CategoryList'
+        products:
+          $ref: '#/components/schemas/ProductList'
+      type: object
+    CategoryList:
+      example:
+        categories: []
+      properties:
+        categories:
+          example: []
+          items:
+            $ref: '#/components/schemas/Category'
+          type: array
+      type: object
+    Product:
+      example:
+        images: []
+        masterPrice:
+          totalPrice: 0.0
+          currency: AED
+        productId: productId
+        name: name
+        rating: 0
+        description: description
+        parentCategory:
+          catalog:
+            catalogId: catalogId
+            name: name
+            rootCategories: []
+          name: name
+          parentCategory: null
+          rootCategory: null
+          categoryId: categoryId
+          key: key
+          slug: slug
+          subCategories:
+            categories: []
+          products:
+            products: []
+        categories:
+          categories: []
+        variants:
+          variants: []
+        key: key
+      properties:
+        productId:
+          type: string
+        key:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        rating:
+          example: 0
+          format: int32
+          type: integer
+        masterPrice:
+          $ref: '#/components/schemas/Price'
+        parentCategory:
+          $ref: '#/components/schemas/Category'
+        categories:
+          $ref: '#/components/schemas/CategoryList'
+        variants:
+          $ref: '#/components/schemas/VariantList'
+        images:
+          example: []
+          items:
+            $ref: '#/components/schemas/Image'
+          type: array
+      type: object
+    ProductList:
+      example:
+        products: []
+      properties:
+        products:
+          example: []
+          items:
+            $ref: '#/components/schemas/Product'
+          type: array
+      type: object
+    Variant:
+      properties:
+        variantId:
+          type: string
+        key:
+          type: string
+        price:
+          $ref: '#/components/schemas/Price'
+        inventory:
+          example: 0
+          format: int64
+          type: integer
+        images:
+          example: []
+          items:
+            $ref: '#/components/schemas/Image'
+          type: array
+      type: object
+    VariantList:
+      example:
+        variants: []
+      properties:
+        variants:
+          example: []
+          items:
+            $ref: '#/components/schemas/Variant'
+          type: array
+      type: object
+    Price:
+      example:
+        totalPrice: 0.0
+        currency: AED
+      properties:
+        totalPrice:
+          default: 0.0
+          example: 0.0
+          format: double
+          minimum: 0.0
+          type: number
+        currency:
+          enum:
+          - AED
+          - AFN
+          - ALL
+          - AMD
+          - ANG
+          - AOA
+          - ARS
+          - AUD
+          - AWG
+          - AZN
+          - BAM
+          - BBD
+          - BDT
+          - BGN
+          - BHD
+          - BIF
+          - BMD
+          - BND
+          - BOB
+          - BRL
+          - BSD
+          - BTN
+          - BWP
+          - BYN
+          - BZD
+          - CAD
+          - CDF
+          - CHF
+          - CLP
+          - CNY
+          - COP
+          - CRC
+          - CUC
+          - CUP
+          - CVE
+          - CZK
+          - DJF
+          - DKK
+          - DOP
+          - DZD
+          - EGP
+          - ERN
+          - ETB
+          - EUR
+          - FJD
+          - FKP
+          - GBP
+          - GEL
+          - GGP
+          - GHS
+          - GIP
+          - GMD
+          - GNF
+          - GTQ
+          - GYD
+          - HKD
+          - HNL
+          - HRK
+          - HTG
+          - HUF
+          - IDR
+          - ILS
+          - IMP
+          - INR
+          - IQD
+          - IRR
+          - ISK
+          - JEP
+          - JMD
+          - JOD
+          - JPY
+          - KES
+          - KGS
+          - KHR
+          - KMF
+          - KPW
+          - KRW
+          - KWD
+          - KYD
+          - KZT
+          - LAK
+          - LBP
+          - LKR
+          - LRD
+          - LSL
+          - LYD
+          - MAD
+          - MDL
+          - MGA
+          - MKD
+          - MMK
+          - MNT
+          - MOP
+          - MRU
+          - MUR
+          - MVR
+          - MWK
+          - MXN
+          - MYR
+          - MZN
+          - NAD
+          - NGN
+          - NIO
+          - NOK
+          - NPR
+          - NZD
+          - OMR
+          - PAB
+          - PEN
+          - PGK
+          - PHP
+          - PKR
+          - PLN
+          - PYG
+          - QAR
+          - RON
+          - RSD
+          - RUB
+          - RWF
+          - SAR
+          - SBD
+          - SCR
+          - SDG
+          - SEK
+          - SGD
+          - SHP
+          - SLL
+          - SOS
+          - SPL
+          - SRD
+          - STN
+          - SVC
+          - SYP
+          - SZL
+          - THB
+          - TJS
+          - TMT
+          - TND
+          - TOP
+          - TRY
+          - TTD
+          - TVD
+          - TWD
+          - TZS
+          - UAH
+          - UGX
+          - USD
+          - UYU
+          - UZS
+          - VEF
+          - VND
+          - VUV
+          - WST
+          - XAF
+          - XCD
+          - XDR
+          - XOF
+          - XPF
+          - YER
+          - ZAR
+          - ZMW
+          - ZWD
+          type: string
+      type: object
+    Image:
+      properties:
+        imageLabel:
+          type: string
+        url:
+          type: string
+      type: object

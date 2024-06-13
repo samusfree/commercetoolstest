@@ -1,0 +1,67 @@
+environment:
+  name: local
+container:
+  tag:
+    version: 0.10.0
+    release:
+nameOverride: ""
+fullnameOverride: "platform-customerservice"
+deployment:
+  replicaCount: 1
+  image:
+    repository: harbor.e2x.com/kata-demo
+    tag: latest
+    pullPolicy: Always
+  ports:
+    - name: http
+      containerPort: 8082
+      protocol: TCP
+  sidecarPorts:
+    - containerPort: 5775
+      name: zk-compact-trft
+      protocol: UDP
+    - containerPort: 5778
+      name: config-rest
+      protocol: TCP
+    - containerPort: 6831
+      name: jg-compact-trft
+      protocol: UDP
+    - containerPort: 6832
+      name: jg-binary-trft
+      protocol: UDP
+    - containerPort: 14271
+      name: admin-http
+      protocol: TCP
+  cloudSQLInstanceName: 
+  resources:
+    requests:
+      cpu: 70m
+  livenessProbe:
+    httpGet:
+      scheme: HTTP
+      path: /customer/actuator/health
+      port: 8082
+    initialDelaySeconds: 120
+    periodSeconds: 60
+    timeoutSeconds: 10
+    successThreshold: 1
+    failureThreshold: 3
+  readinessProbe:
+    httpGet:
+      scheme: HTTP
+      path: /customer/actuator/health
+      port: 8082
+    initialDelaySeconds: 60
+    periodSeconds: 5
+    timeoutSeconds: 5
+    successThreshold: 1
+    failureThreshold: 10
+service:
+  type: ClusterIP
+  ports: 
+    - name: http
+      port: 8082
+      targetPort: 8082
+      protocol: TCP
+
+serviceAccountName: demo-deployer

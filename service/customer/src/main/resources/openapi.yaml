@@ -1,0 +1,227 @@
+openapi: 3.0.1
+info:
+  contact:
+    email: dom.selvon@e2x.com
+  description: Customer service for E2X kata bootstrap.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: https://kata.e2x.com/terms/
+  title: Customer
+  version: 1.0.0
+  x-kata-implementations:
+  - generic:
+    - location: service/customer
+      icon: customer
+  - commercetools:
+    - location: applydigital/kata-customer-service
+      icon: commercetools_logo
+  - magento:
+    - location: kata-service/magentocustomer
+      icon: magento_logo
+  - bigcommerce:
+    - location: kata-service/bigc-customer
+      icon: bigcommerce_logo
+  x-kata-commercetools: true
+  x-kata-containerised: true
+  x-kata-environment-name: demo
+  x-kata-kubernetes-secrets: true
+externalDocs:
+  description: Find out more about Kata Bootstrap
+  url: https://kata.e2x.com
+servers:
+- url: http://localhost:8082/v1
+tags:
+- description: Everything about your customer
+  name: customer
+paths:
+  /customer/login:
+    post:
+      description: "Logs a customer in using their username, an email, and their password."
+      operationId: loginCustomer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginDetails'
+        description: Optional description in *Markdown*
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Customer'
+          description: Success
+      summary: Logs the customer into the system
+      tags:
+      - customer
+      x-content-type: application/json
+      x-accepts: application/json
+      x-tags:
+      - tag: customer
+  /customer:
+    get:
+      description: Get a customer by email address
+      operationId: getCustomerByEmail
+      parameters:
+      - explode: true
+        in: query
+        name: email_address
+        required: true
+        schema:
+          example: username@usernet.com
+          type: string
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Customer'
+          description: Success
+        "404":
+          description: User does not exist
+      summary: Gets a customer by email address
+      tags:
+      - customer
+      x-accepts: application/json
+      x-tags:
+      - tag: customer
+    post:
+      description: Registers a new customer with the system.
+      operationId: register
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Customer'
+        description: The Customer being registered
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Customer'
+          description: Success
+      summary: Registers a new customer into the system
+      tags:
+      - customer
+      x-content-type: application/json
+      x-accepts: application/json
+      x-tags:
+      - tag: customer
+  /customer/{customerId}:
+    delete:
+      description: Deletes a customer by their customer ID
+      operationId: deleteByCustomerId
+      parameters:
+      - explode: false
+        in: path
+        name: customerId
+        required: true
+        schema:
+          example: 55768304-6f69-4e68-a2ce-3ad95f744fe7
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Customer'
+          description: Success
+        "404":
+          description: User does not exist
+      summary: Deletes a customer by their customer ID
+      tags:
+      - customer
+      x-accepts: application/json
+      x-tags:
+      - tag: customer
+components:
+  schemas:
+    LoginDetails:
+      example:
+        password: password
+        username: username
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+      type: object
+    Customer:
+      example:
+        basketId: basketId
+        address:
+          line4: line4
+          phoneNumber: phoneNumber
+          nameOfResident: nameOfResident
+          addressType: HOME
+          postcode: postcode
+          line3: line3
+          line2: line2
+          line1: line1
+          addressId: addressId
+        loginDetails:
+          password: password
+          username: username
+        customerId: customerId
+        name: name
+        shippingSame: true
+        billingSame: true
+      properties:
+        customerId:
+          type: string
+        name:
+          type: string
+        loginDetails:
+          $ref: '#/components/schemas/LoginDetails'
+        address:
+          $ref: '#/components/schemas/Address'
+        basketId:
+          type: string
+        shippingSame:
+          type: boolean
+        billingSame:
+          type: boolean
+      type: object
+    Address:
+      example:
+        line4: line4
+        phoneNumber: phoneNumber
+        nameOfResident: nameOfResident
+        addressType: HOME
+        postcode: postcode
+        line3: line3
+        line2: line2
+        line1: line1
+        addressId: addressId
+      properties:
+        addressId:
+          type: string
+        line1:
+          type: string
+        line2:
+          type: string
+        line3:
+          type: string
+        line4:
+          type: string
+        postcode:
+          type: string
+        phoneNumber:
+          type: string
+        nameOfResident:
+          type: string
+        addressType:
+          default: HOME
+          description: Type of this address
+          enum:
+          - SHIPPING
+          - BILLING
+          - HOME
+          type: string
+      type: object

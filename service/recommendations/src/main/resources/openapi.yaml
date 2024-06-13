@@ -1,0 +1,261 @@
+openapi: 3.0.1
+info:
+  contact:
+    email: dom.selvon@e2x.com
+  description: Recommendations service for E2X kata bootstrap.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: https://kata.e2x.com/terms/
+  title: Recommendations
+  version: 1.0.0
+  x-kata-implementations:
+  - generic:
+    - location: service/recommendations
+      icon: recommendations
+  x-kata-commercetools: false
+  x-kata-containerised: true
+  x-kata-environment-name: demo
+  x-kata-kubernetes-secrets: false
+externalDocs:
+  description: Find out more about Kata Bootstrap
+  url: http://kata.e2x.com
+servers:
+- url: http://localhost:8087/v1
+tags:
+- description: Search for products
+  name: search
+paths:
+  /recommend:
+    post:
+      description: Returns recommendations
+      operationId: recommend
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Recommendations'
+          description: successful operation
+      summary: Recommend products
+      tags:
+      - recommend
+      x-accepts: application/json
+      x-tags:
+      - tag: recommend
+components:
+  schemas:
+    Recommendations:
+      example:
+        total: 6
+        offset: 5
+        count: 0
+        limit: 1
+        results: []
+      properties:
+        count:
+          type: integer
+        total:
+          type: integer
+        limit:
+          type: integer
+        offset:
+          type: integer
+        results:
+          example: []
+          items:
+            $ref: '#/components/schemas/Product'
+          type: array
+      type: object
+    Product:
+      properties:
+        key:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        masterPrice:
+          $ref: '#/components/schemas/Price'
+        image:
+          $ref: '#/components/schemas/Image'
+      type: object
+    Image:
+      properties:
+        imageLabel:
+          type: string
+        url:
+          type: string
+      type: object
+    Price:
+      properties:
+        totalPrice:
+          format: double
+          minimum: 0
+          type: number
+        currency:
+          enum:
+          - AED
+          - AFN
+          - ALL
+          - AMD
+          - ANG
+          - AOA
+          - ARS
+          - AUD
+          - AWG
+          - AZN
+          - BAM
+          - BBD
+          - BDT
+          - BGN
+          - BHD
+          - BIF
+          - BMD
+          - BND
+          - BOB
+          - BRL
+          - BSD
+          - BTN
+          - BWP
+          - BYN
+          - BZD
+          - CAD
+          - CDF
+          - CHF
+          - CLP
+          - CNY
+          - COP
+          - CRC
+          - CUC
+          - CUP
+          - CVE
+          - CZK
+          - DJF
+          - DKK
+          - DOP
+          - DZD
+          - EGP
+          - ERN
+          - ETB
+          - EUR
+          - FJD
+          - FKP
+          - GBP
+          - GEL
+          - GGP
+          - GHS
+          - GIP
+          - GMD
+          - GNF
+          - GTQ
+          - GYD
+          - HKD
+          - HNL
+          - HRK
+          - HTG
+          - HUF
+          - IDR
+          - ILS
+          - IMP
+          - INR
+          - IQD
+          - IRR
+          - ISK
+          - JEP
+          - JMD
+          - JOD
+          - JPY
+          - KES
+          - KGS
+          - KHR
+          - KMF
+          - KPW
+          - KRW
+          - KWD
+          - KYD
+          - KZT
+          - LAK
+          - LBP
+          - LKR
+          - LRD
+          - LSL
+          - LYD
+          - MAD
+          - MDL
+          - MGA
+          - MKD
+          - MMK
+          - MNT
+          - MOP
+          - MRU
+          - MUR
+          - MVR
+          - MWK
+          - MXN
+          - MYR
+          - MZN
+          - NAD
+          - NGN
+          - NIO
+          - NOK
+          - NPR
+          - NZD
+          - OMR
+          - PAB
+          - PEN
+          - PGK
+          - PHP
+          - PKR
+          - PLN
+          - PYG
+          - QAR
+          - RON
+          - RSD
+          - RUB
+          - RWF
+          - SAR
+          - SBD
+          - SCR
+          - SDG
+          - SEK
+          - SGD
+          - SHP
+          - SLL
+          - SOS
+          - SPL
+          - SRD
+          - STN
+          - SVC
+          - SYP
+          - SZL
+          - THB
+          - TJS
+          - TMT
+          - TND
+          - TOP
+          - TRY
+          - TTD
+          - TVD
+          - TWD
+          - TZS
+          - UAH
+          - UGX
+          - USD
+          - UYU
+          - UZS
+          - VEF
+          - VND
+          - VUV
+          - WST
+          - XAF
+          - XCD
+          - XDR
+          - XOF
+          - XPF
+          - YER
+          - ZAR
+          - ZMW
+          - ZWD
+          type: string
+      type: object

@@ -1,0 +1,10 @@
+${Ansi.BLUE}           ******      *****.${Ansi.DEFAULT}        @@@@@     @@@@@@@@@@@@@@@    @@@@@
+${Ansi.BLUE}   * ** *, ******    *****   ${Ansi.DEFAULT}       @@@@@@@         @@@@         @@@@@@@
+${Ansi.BLUE}    *  *  ******* ******     ${Ansi.DEFAULT}      @@@@ (@@@        @@@@        @@@@ @@@@
+${Ansi.BLUE}   *  **  *  ********        ${Ansi.DEFAULT}     @@@@   @@@@       @@@@       @@@@   @@@@
+${Ansi.BLUE}  *    *  ********,  ****    ${Ansi.DEFAULT}    @@@@,,,,,@@@@      @@@@      @@@@,,,,,@@@@
+${Ansi.BLUE}      **    *****     *****  ${Ansi.DEFAULT}   @@@@@@@@@@@@@@@     @@@@     @@@@@@@@@@@@@@@
+${Ansi.BLUE}       * ,* *****      .**** ${Ansi.DEFAULT}  @@@@         @@@@/   @@@@    @@@@         @@@@
+
+${Ansi.BLUE} :: Kata :: Kickstarter for API-First Transactional Applications :: ${Ansi.DEFAULT}
+${Ansi.BLUE} :: Kata :: SearchService KATA Spring Boot Application :: ${Ansi.DEFAULT}

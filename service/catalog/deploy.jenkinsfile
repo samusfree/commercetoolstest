@@ -1,0 +1,46 @@
+pipeline {
+  agent {
+    kubernetes {
+      yaml """
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    jenkins-agent: daemonless
+spec:
+  containers:
+    - name: helm
+      image: harbor.e2x.com/library/helm:v3.0.0-alpine
+      imagePullPolicy: Always
+      command:
+        - cat
+      tty: true
+      volumeMounts:
+        - name: kubectl-config
+          mountPath: /home/helm/.kube
+  volumes:
+    - name: kubectl-config
+      secret:
+        secretName: demo-deployer-kubeconfig
+        items:
+          - key: config
+            path: config
+"""
+    }
+  }
+  stages {
+    stage("Checkout") {
+      steps {
+        checkout scm
+      }
+    }
+
+    stage("Deploy catalog Service") {
+      steps {
+        container('helm') {
+          sh "helm upgrade kata-demo-catalog -i -f helm/platform-catalogservice/environment/demo/values.yaml --namespace demo --history-max 2 helm/platform-catalogservice"
+        }
+      }
+    }
+  }
+}

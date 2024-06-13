@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "platform-catalogservice.fullname" . }}
+  labels:
+    app.kubernetes.io/name: {{ include "platform-catalogservice.name" . }}
+    helm.sh/chart: {{ include "platform-catalogservice.chart" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+spec:
+  type: {{ .Values.service.type }}
+  selector:
+    app.kubernetes.io/name: {{ include "platform-catalogservice.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+  ports:
+{{ toYaml .Values.service.ports | indent 4 }}

@@ -1,0 +1,1013 @@
+openapi: 3.0.1
+info:
+  contact:
+    email: dom.selvon@e2x.com
+  description: Basket service for E2X kata bootstrap.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: https://kata.e2x.com/terms/
+  title: Basket
+  version: 1.0.0
+  x-kata-implementations:
+  - generic:
+    - location: service/basket
+      icon: basket
+  - commercetools:
+    - location: applydigital/kata-basket-service
+      icon: commercetools_logo
+  - magento:
+    - location: kata-service/magentobasket
+      icon: magento_logo
+  - bigcommerce:
+    - location: kata-service/bigc-basket
+      icon: bigcommerce_logo
+  x-kata-commercetools: true
+  x-kata-containerised: true
+  x-kata-environment-name: demo
+  x-kata-kubernetes-secrets: true
+externalDocs:
+  description: Find out more about Kata Bootstrap
+  url: https://kata.e2x.com
+servers:
+- url: http://localhost:8081/v1
+tags:
+- description: Everything about your basket
+  name: basket
+paths:
+  /basket/{customerId}:
+    get:
+      description: Retrieves the referenced basket for the current user.
+      operationId: getBasketByCustomerId
+      parameters:
+      - description: ID of customer for whose basket to return
+        explode: false
+        in: path
+        name: customerId
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Basket'
+          description: Success
+      summary: Retrieve the current basket for the specified customer
+      tags:
+      - basket
+      x-accepts: application/json
+      x-tags:
+      - tag: basket
+  /basket/{customerId}/add:
+    post:
+      description: Adds a single item to the basket.
+      operationId: addToBasketByCustomerId
+      parameters:
+      - description: Owner of the basket to add an item to
+        explode: false
+        in: path
+        name: customerId
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Product'
+        description: The commerceitem being added
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Basket'
+          description: Success
+      summary: Add item to basket
+      tags:
+      - basket
+      x-content-type: application/json
+      x-accepts: application/json
+      x-tags:
+      - tag: basket
+  /basket/{customerId}/remove:
+    post:
+      description: Removes a single item from the basket.
+      operationId: removeFromBasketByCustomerId
+      parameters:
+      - description: Owner of the basket to add an item to
+        explode: false
+        in: path
+        name: customerId
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommerceItemId'
+        description: The identifier of the commerceitem being remove
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Basket'
+          description: Success
+      summary: Remove item from basket
+      tags:
+      - basket
+      x-content-type: application/json
+      x-accepts: application/json
+      x-tags:
+      - tag: basket
+  /basket/{customerId}/billing-address:
+    post:
+      description: Sets the billing address on the basket.
+      operationId: setBillingAddressByCustomerId
+      parameters:
+      - description: Owner of the basket
+        explode: false
+        in: path
+        name: customerId
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Address'
+        description: The billing address being added
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Basket'
+          description: Success
+        "400":
+          description: Billing address not valid
+        "404":
+          description: Basket does not exist
+      summary: Set billing address on basket
+      tags:
+      - basket
+      x-content-type: application/json
+      x-accepts: application/json
+      x-tags:
+      - tag: basket
+  /basket/{customerId}/shipping-address:
+    post:
+      description: Sets the shipping address on the basket.
+      operationId: setShippingAddressByCustomerId
+      parameters:
+      - description: Owner of the basket
+        explode: false
+        in: path
+        name: customerId
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Address'
+        description: The shipping address being added
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Basket'
+          description: Success
+        "400":
+          description: Shipping address not valid
+        "404":
+          description: Basket does not exist
+      summary: Set shipping address on basket
+      tags:
+      - basket
+      x-content-type: application/json
+      x-accepts: application/json
+      x-tags:
+      - tag: basket
+  /basket/{customerId}/email:
+    post:
+      description: Sets the email address on the basket.
+      operationId: setEmailAddressByCustomerId
+      parameters:
+      - description: Owner of the basket
+        explode: false
+        in: path
+        name: customerId
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CustomerEmail'
+        description: The email address being added
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Basket'
+          description: Success
+        "400":
+          description: Email address not valid
+        "404":
+          description: Basket does not exist
+      summary: Set email address on basket
+      tags:
+      - basket
+      x-content-type: application/json
+      x-accepts: application/json
+      x-tags:
+      - tag: basket
+components:
+  schemas:
+    Basket:
+      example:
+        basketId: basketId
+        anonCustomerId: anonCustomerId
+        numberOfItems: 0
+        price:
+          totalPrice: 0.6027456183070403
+          currency: AED
+        customerEmail: customerEmail
+        shippingInfo:
+          address:
+            country: AC
+            firstName: firstName
+            lastName: lastName
+            line4: line4
+            phoneNumber: phoneNumber
+            postcode: postcode
+            line3: line3
+            line2: line2
+            line1: line1
+            addressId: addressId
+          name: name
+          shippingInfoId: shippingInfoId
+          commerceItems:
+          - commerceItemId: commerceItemId
+            productImage: productImage
+            quantity: 5
+            productId: productId
+            price:
+              totalPrice: 0.6027456183070403
+              currency: AED
+            name: name
+            variantId: 1
+            productSlug: productSlug
+          - commerceItemId: commerceItemId
+            productImage: productImage
+            quantity: 5
+            productId: productId
+            price:
+              totalPrice: 0.6027456183070403
+              currency: AED
+            name: name
+            variantId: 1
+            productSlug: productSlug
+        customerId: customerId
+        paymentInfo:
+          address:
+            country: AC
+            firstName: firstName
+            lastName: lastName
+            line4: line4
+            phoneNumber: phoneNumber
+            postcode: postcode
+            line3: line3
+            line2: line2
+            line1: line1
+            addressId: addressId
+          name: name
+          paymentPayload: paymentPayload
+          paymentInfoId: paymentInfoId
+          paymentType: paymentType
+          commerceItems:
+          - commerceItemId: commerceItemId
+            productImage: productImage
+            quantity: 5
+            productId: productId
+            price:
+              totalPrice: 0.6027456183070403
+              currency: AED
+            name: name
+            variantId: 1
+            productSlug: productSlug
+          - commerceItemId: commerceItemId
+            productImage: productImage
+            quantity: 5
+            productId: productId
+            price:
+              totalPrice: 0.6027456183070403
+              currency: AED
+            name: name
+            variantId: 1
+            productSlug: productSlug
+        commerceItems: []
+        customer:
+          customerId: customerId
+          name: name
+      properties:
+        basketId:
+          type: string
+        anonCustomerId:
+          type: string
+        customerId:
+          type: string
+        customerEmail:
+          format: email
+          type: string
+        commerceItems:
+          example: []
+          items:
+            $ref: '#/components/schemas/CommerceItem'
+          type: array
+        numberOfItems:
+          format: int32
+          minimum: 0
+          type: integer
+        price:
+          $ref: '#/components/schemas/Price'
+        shippingInfo:
+          $ref: '#/components/schemas/ShippingInfo'
+        paymentInfo:
+          $ref: '#/components/schemas/PaymentInfo'
+        customer:
+          $ref: '#/components/schemas/Customer'
+      type: object
+    CommerceItem:
+      example:
+        commerceItemId: commerceItemId
+        productImage: productImage
+        quantity: 5
+        productId: productId
+        price:
+          totalPrice: 0.6027456183070403
+          currency: AED
+        name: name
+        variantId: 1
+        productSlug: productSlug
+      properties:
+        commerceItemId:
+          type: string
+        name:
+          type: string
+        productSlug:
+          type: string
+        productImage:
+          type: string
+        productId:
+          type: string
+        variantId:
+          format: int32
+          type: integer
+        quantity:
+          format: int64
+          type: integer
+        price:
+          $ref: '#/components/schemas/Price'
+      type: object
+    Price:
+      example:
+        totalPrice: 0.6027456183070403
+        currency: AED
+      properties:
+        totalPrice:
+          format: double
+          minimum: 0
+          type: number
+        currency:
+          enum:
+          - AED
+          - AFN
+          - ALL
+          - AMD
+          - ANG
+          - AOA
+          - ARS
+          - AUD
+          - AWG
+          - AZN
+          - BAM
+          - BBD
+          - BDT
+          - BGN
+          - BHD
+          - BIF
+          - BMD
+          - BND
+          - BOB
+          - BRL
+          - BSD
+          - BTN
+          - BWP
+          - BYN
+          - BZD
+          - CAD
+          - CDF
+          - CHF
+          - CLP
+          - CNY
+          - COP
+          - CRC
+          - CUC
+          - CUP
+          - CVE
+          - CZK
+          - DJF
+          - DKK
+          - DOP
+          - DZD
+          - EGP
+          - ERN
+          - ETB
+          - EUR
+          - FJD
+          - FKP
+          - GBP
+          - GEL
+          - GGP
+          - GHS
+          - GIP
+          - GMD
+          - GNF
+          - GTQ
+          - GYD
+          - HKD
+          - HNL
+          - HRK
+          - HTG
+          - HUF
+          - IDR
+          - ILS
+          - IMP
+          - INR
+          - IQD
+          - IRR
+          - ISK
+          - JEP
+          - JMD
+          - JOD
+          - JPY
+          - KES
+          - KGS
+          - KHR
+          - KMF
+          - KPW
+          - KRW
+          - KWD
+          - KYD
+          - KZT
+          - LAK
+          - LBP
+          - LKR
+          - LRD
+          - LSL
+          - LYD
+          - MAD
+          - MDL
+          - MGA
+          - MKD
+          - MMK
+          - MNT
+          - MOP
+          - MRU
+          - MUR
+          - MVR
+          - MWK
+          - MXN
+          - MYR
+          - MZN
+          - NAD
+          - NGN
+          - NIO
+          - NOK
+          - NPR
+          - NZD
+          - OMR
+          - PAB
+          - PEN
+          - PGK
+          - PHP
+          - PKR
+          - PLN
+          - PYG
+          - QAR
+          - RON
+          - RSD
+          - RUB
+          - RWF
+          - SAR
+          - SBD
+          - SCR
+          - SDG
+          - SEK
+          - SGD
+          - SHP
+          - SLL
+          - SOS
+          - SPL
+          - SRD
+          - STN
+          - SVC
+          - SYP
+          - SZL
+          - THB
+          - TJS
+          - TMT
+          - TND
+          - TOP
+          - TRY
+          - TTD
+          - TVD
+          - TWD
+          - TZS
+          - UAH
+          - UGX
+          - USD
+          - UYU
+          - UZS
+          - VEF
+          - VND
+          - VUV
+          - WST
+          - XAF
+          - XCD
+          - XDR
+          - XOF
+          - XPF
+          - YER
+          - ZAR
+          - ZMW
+          - ZWD
+          type: string
+      type: object
+    ShippingInfo:
+      example:
+        address:
+          country: AC
+          firstName: firstName
+          lastName: lastName
+          line4: line4
+          phoneNumber: phoneNumber
+          postcode: postcode
+          line3: line3
+          line2: line2
+          line1: line1
+          addressId: addressId
+        name: name
+        shippingInfoId: shippingInfoId
+        commerceItems:
+        - commerceItemId: commerceItemId
+          productImage: productImage
+          quantity: 5
+          productId: productId
+          price:
+            totalPrice: 0.6027456183070403
+            currency: AED
+          name: name
+          variantId: 1
+          productSlug: productSlug
+        - commerceItemId: commerceItemId
+          productImage: productImage
+          quantity: 5
+          productId: productId
+          price:
+            totalPrice: 0.6027456183070403
+            currency: AED
+          name: name
+          variantId: 1
+          productSlug: productSlug
+      properties:
+        shippingInfoId:
+          type: string
+        name:
+          type: string
+        address:
+          $ref: '#/components/schemas/Address'
+        commerceItems:
+          items:
+            $ref: '#/components/schemas/CommerceItem'
+          type: array
+      type: object
+    PaymentInfo:
+      example:
+        address:
+          country: AC
+          firstName: firstName
+          lastName: lastName
+          line4: line4
+          phoneNumber: phoneNumber
+          postcode: postcode
+          line3: line3
+          line2: line2
+          line1: line1
+          addressId: addressId
+        name: name
+        paymentPayload: paymentPayload
+        paymentInfoId: paymentInfoId
+        paymentType: paymentType
+        commerceItems:
+        - commerceItemId: commerceItemId
+          productImage: productImage
+          quantity: 5
+          productId: productId
+          price:
+            totalPrice: 0.6027456183070403
+            currency: AED
+          name: name
+          variantId: 1
+          productSlug: productSlug
+        - commerceItemId: commerceItemId
+          productImage: productImage
+          quantity: 5
+          productId: productId
+          price:
+            totalPrice: 0.6027456183070403
+            currency: AED
+          name: name
+          variantId: 1
+          productSlug: productSlug
+      properties:
+        paymentInfoId:
+          type: string
+        name:
+          type: string
+        paymentType:
+          type: string
+        paymentPayload:
+          type: string
+        commerceItems:
+          items:
+            $ref: '#/components/schemas/CommerceItem'
+          type: array
+        address:
+          $ref: '#/components/schemas/Address'
+      type: object
+    Address:
+      example:
+        country: AC
+        firstName: firstName
+        lastName: lastName
+        line4: line4
+        phoneNumber: phoneNumber
+        postcode: postcode
+        line3: line3
+        line2: line2
+        line1: line1
+        addressId: addressId
+      properties:
+        addressId:
+          type: string
+        line1:
+          type: string
+        line2:
+          type: string
+        line3:
+          type: string
+        line4:
+          type: string
+        postcode:
+          type: string
+        country:
+          enum:
+          - AC
+          - AD
+          - AE
+          - AF
+          - AG
+          - AI
+          - AL
+          - AM
+          - AN
+          - AO
+          - AQ
+          - AR
+          - AS
+          - AT
+          - AU
+          - AW
+          - AX
+          - AZ
+          - BA
+          - BB
+          - BD
+          - BE
+          - BF
+          - BG
+          - BH
+          - BI
+          - BJ
+          - BL
+          - BM
+          - BN
+          - BO
+          - BQ
+          - BR
+          - BS
+          - BT
+          - BU
+          - BV
+          - BW
+          - BY
+          - BZ
+          - CA
+          - CC
+          - CD
+          - CF
+          - CG
+          - CH
+          - CI
+          - CK
+          - CL
+          - CM
+          - CN
+          - CO
+          - CP
+          - CR
+          - CS
+          - CU
+          - CV
+          - CW
+          - CX
+          - CY
+          - CZ
+          - DE
+          - DG
+          - DJ
+          - DK
+          - DM
+          - DO
+          - DZ
+          - EA
+          - EC
+          - EE
+          - EG
+          - EH
+          - ER
+          - ES
+          - ET
+          - EU
+          - FI
+          - FJ
+          - FK
+          - FM
+          - FO
+          - FR
+          - FX
+          - GA
+          - GB
+          - GD
+          - GE
+          - GF
+          - GG
+          - GH
+          - GI
+          - GL
+          - GM
+          - GN
+          - GP
+          - GQ
+          - GR
+          - GS
+          - GT
+          - GU
+          - GW
+          - GY
+          - HK
+          - HM
+          - HN
+          - HR
+          - HT
+          - HU
+          - IC
+          - ID
+          - IE
+          - IL
+          - IM
+          - IN
+          - IO
+          - IQ
+          - IR
+          - IS
+          - IT
+          - JE
+          - JM
+          - JO
+          - JP
+          - KE
+          - KG
+          - KH
+          - KI
+          - KM
+          - KN
+          - KP
+          - KR
+          - KW
+          - KY
+          - KZ
+          - LA
+          - LB
+          - LC
+          - LI
+          - LK
+          - LR
+          - LS
+          - LT
+          - LU
+          - LV
+          - LY
+          - MA
+          - MC
+          - MD
+          - ME
+          - MF
+          - MG
+          - MH
+          - MK
+          - ML
+          - MM
+          - MN
+          - MO
+          - MP
+          - MQ
+          - MR
+          - MS
+          - MT
+          - MU
+          - MV
+          - MW
+          - MX
+          - MY
+          - MZ
+          - NA
+          - NC
+          - NE
+          - NF
+          - NG
+          - NI
+          - NL
+          - "NO"
+          - NP
+          - NR
+          - NT
+          - NU
+          - NZ
+          - OM
+          - PA
+          - PE
+          - PF
+          - PG
+          - PH
+          - PK
+          - PL
+          - PM
+          - PN
+          - PR
+          - PS
+          - PT
+          - PW
+          - PY
+          - QA
+          - RE
+          - RO
+          - RS
+          - RU
+          - RW
+          - SA
+          - SB
+          - SC
+          - SD
+          - SE
+          - SF
+          - SG
+          - SH
+          - SI
+          - SJ
+          - SK
+          - SL
+          - SM
+          - SN
+          - SO
+          - SR
+          - SS
+          - ST
+          - SU
+          - SV
+          - SX
+          - SY
+          - SZ
+          - TA
+          - TC
+          - TD
+          - TF
+          - TG
+          - TH
+          - TJ
+          - TK
+          - TL
+          - TM
+          - TN
+          - TO
+          - TP
+          - TR
+          - TT
+          - TV
+          - TW
+          - TZ
+          - UA
+          - UG
+          - UK
+          - UM
+          - US
+          - UY
+          - UZ
+          - VA
+          - VC
+          - VE
+          - VG
+          - VI
+          - VN
+          - VU
+          - WF
+          - WS
+          - XK
+          - YE
+          - YT
+          - YU
+          - ZA
+          - ZM
+          - ZR
+          - ZW
+          type: string
+        phoneNumber:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+      type: object
+    Customer:
+      example:
+        customerId: customerId
+        name: name
+      properties:
+        customerId:
+          type: string
+        name:
+          type: string
+      type: object
+    Product:
+      example:
+        quantity: 6
+        variantId: 0
+        productKey: productKey
+      properties:
+        productKey:
+          type: string
+        variantId:
+          format: int32
+          type: integer
+        quantity:
+          format: int64
+          type: integer
+      type: object
+    CommerceItemId:
+      example:
+        commerceItemId: commerceItemId
+      properties:
+        commerceItemId:
+          type: string
+      type: object
+    CustomerEmail:
+      example:
+        email: email
+      properties:
+        email:
+          format: email
+          type: string
+      type: object

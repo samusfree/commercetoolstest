@@ -1,0 +1,447 @@
+openapi: 3.0.1
+info:
+  contact:
+    email: dom.selvon@e2x.com
+  description: Search service for E2X kata bootstrap.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: https://kata.e2x.com/terms/
+  title: Search
+  version: 1.0.0
+  x-kata-implementations:
+  - generic:
+    - location: service/search
+      icon: search
+  - commercetools:
+    - location: applydigital/kata-search-service
+      icon: commercetools_logo
+  - lucidworks:
+    - location: kata-service/lucidsearch
+      icon: lucidworks_logo
+  - magento:
+    - location: kata-service/magentosearch
+      icon: magento_logo
+  - bigcommerce:
+    - location: kata-service/bigc-search
+      icon: bigcommerce_logo
+  - algolia:
+    - location: kata-service/algolia-search
+      icon: algolia_logo
+  x-kata-commercetools: true
+  x-kata-containerised: true
+  x-kata-environment-name: demo
+  x-kata-kubernetes-secrets: true
+externalDocs:
+  description: Find out more about Kata Bootstrap
+  url: https://kata.e2x.com
+servers:
+- url: http://localhost:8084/v1
+tags:
+- description: Search for products
+  name: search
+paths:
+  /query:
+    post:
+      description: Returns search results
+      operationId: searchByParams
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/QueryParams'
+        description: Search query parameters
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchResult'
+          description: successful operation
+        "400":
+          description: Invalid search parameters
+      summary: Search for products
+      tags:
+      - search
+      x-content-type: application/json
+      x-accepts: application/json
+      x-tags:
+      - tag: search
+  /filters/{language}:
+    get:
+      description: Retrieve filters for search
+      operationId: retrieveFilters
+      parameters:
+      - description: Language of filter definitions to retrieve
+        explode: false
+        in: path
+        name: language
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FilterDefinitions'
+          description: successful operation
+      summary: Retrieve filters for search
+      tags:
+      - search
+      x-accepts: application/json
+      x-tags:
+      - tag: search
+components:
+  schemas:
+    QueryParams:
+      example:
+        offset: 0
+        limit: 282
+        language: language
+        text: text
+        filters:
+        - filters
+        - filters
+        sort: NONE
+        facets:
+        - facets
+        - facets
+        order: DESC
+      properties:
+        text:
+          description: Text to search for
+          type: string
+        language:
+          description: Language to search
+          type: string
+        facets:
+          description: Facets to report
+          items:
+            type: string
+          type: array
+        filters:
+          description: Filters to apply to results and facets
+          items:
+            type: string
+          type: array
+        limit:
+          default: 500
+          description: Limit number of results
+          maximum: 500
+          minimum: 1
+          type: integer
+        offset:
+          default: 0
+          description: Offset for start of results
+          minimum: 0
+          type: integer
+        sort:
+          default: NONE
+          description: How to sort results
+          enum:
+          - NONE
+          - PRICE
+          - NAME
+          - CREATED
+          - MODIFIED
+          - ID
+          - SCORE
+          type: string
+        order:
+          default: DESC
+          description: Order of sorting
+          enum:
+          - ASC
+          - DESC
+          type: string
+      required:
+      - language
+      type: object
+    SearchResult:
+      example:
+        total: 6
+        offset: 5
+        query:
+          offset: 0
+          limit: 282
+          language: language
+          text: text
+          filters:
+          - filters
+          - filters
+          sort: NONE
+          facets:
+          - facets
+          - facets
+          order: DESC
+        count: 0
+        limit: 1
+        results: []
+        facetResults: []
+      properties:
+        count:
+          type: integer
+        total:
+          type: integer
+        limit:
+          type: integer
+        offset:
+          type: integer
+        results:
+          example: []
+          items:
+            $ref: '#/components/schemas/Product'
+          type: array
+        facetResults:
+          example: []
+          items:
+            $ref: '#/components/schemas/Facet'
+          type: array
+        query:
+          $ref: '#/components/schemas/QueryParams'
+      type: object
+    Product:
+      properties:
+        key:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        masterPrice:
+          $ref: '#/components/schemas/Price'
+        image:
+          $ref: '#/components/schemas/Image'
+      type: object
+    Image:
+      properties:
+        imageLabel:
+          type: string
+        url:
+          type: string
+      type: object
+    Facet:
+      properties:
+        property:
+          type: string
+        values:
+          items:
+            $ref: '#/components/schemas/FacetDetail'
+          type: array
+      type: object
+    FacetDetail:
+      properties:
+        label:
+          type: string
+        expression:
+          type: string
+        count:
+          type: integer
+      type: object
+    FilterDefinitions:
+      example:
+        categories:
+        - expression: expression
+          label: label
+        - expression: expression
+          label: label
+        facets:
+        - expression: expression
+          label: label
+        - expression: expression
+          label: label
+      properties:
+        categories:
+          items:
+            $ref: '#/components/schemas/FilterDefinition'
+          type: array
+        facets:
+          items:
+            $ref: '#/components/schemas/FilterDefinition'
+          type: array
+      type: object
+    FilterDefinition:
+      example:
+        expression: expression
+        label: label
+      properties:
+        label:
+          type: string
+        expression:
+          type: string
+      type: object
+    Price:
+      properties:
+        totalPrice:
+          format: double
+          minimum: 0
+          type: number
+        currency:
+          enum:
+          - AED
+          - AFN
+          - ALL
+          - AMD
+          - ANG
+          - AOA
+          - ARS
+          - AUD
+          - AWG
+          - AZN
+          - BAM
+          - BBD
+          - BDT
+          - BGN
+          - BHD
+          - BIF
+          - BMD
+          - BND
+          - BOB
+          - BRL
+          - BSD
+          - BTN
+          - BWP
+          - BYN
+          - BZD
+          - CAD
+          - CDF
+          - CHF
+          - CLP
+          - CNY
+          - COP
+          - CRC
+          - CUC
+          - CUP
+          - CVE
+          - CZK
+          - DJF
+          - DKK
+          - DOP
+          - DZD
+          - EGP
+          - ERN
+          - ETB
+          - EUR
+          - FJD
+          - FKP
+          - GBP
+          - GEL
+          - GGP
+          - GHS
+          - GIP
+          - GMD
+          - GNF
+          - GTQ
+          - GYD
+          - HKD
+          - HNL
+          - HRK
+          - HTG
+          - HUF
+          - IDR
+          - ILS
+          - IMP
+          - INR
+          - IQD
+          - IRR
+          - ISK
+          - JEP
+          - JMD
+          - JOD
+          - JPY
+          - KES
+          - KGS
+          - KHR
+          - KMF
+          - KPW
+          - KRW
+          - KWD
+          - KYD
+          - KZT
+          - LAK
+          - LBP
+          - LKR
+          - LRD
+          - LSL
+          - LYD
+          - MAD
+          - MDL
+          - MGA
+          - MKD
+          - MMK
+          - MNT
+          - MOP
+          - MRU
+          - MUR
+          - MVR
+          - MWK
+          - MXN
+          - MYR
+          - MZN
+          - NAD
+          - NGN
+          - NIO
+          - NOK
+          - NPR
+          - NZD
+          - OMR
+          - PAB
+          - PEN
+          - PGK
+          - PHP
+          - PKR
+          - PLN
+          - PYG
+          - QAR
+          - RON
+          - RSD
+          - RUB
+          - RWF
+          - SAR
+          - SBD
+          - SCR
+          - SDG
+          - SEK
+          - SGD
+          - SHP
+          - SLL
+          - SOS
+          - SPL
+          - SRD
+          - STN
+          - SVC
+          - SYP
+          - SZL
+          - THB
+          - TJS
+          - TMT
+          - TND
+          - TOP
+          - TRY
+          - TTD
+          - TVD
+          - TWD
+          - TZS
+          - UAH
+          - UGX
+          - USD
+          - UYU
+          - UZS
+          - VEF
+          - VND
+          - VUV
+          - WST
+          - XAF
+          - XCD
+          - XDR
+          - XOF
+          - XPF
+          - YER
+          - ZAR
+          - ZMW
+          - ZWD
+          type: string
+      type: object

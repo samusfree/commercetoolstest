@@ -1,0 +1,75 @@
+environment:
+  name: local
+container:
+  tag:
+    version: 0.10.0
+    release:
+nameOverride: ""
+fullnameOverride: "platform-catalogservice"
+deployment:
+  replicaCount: 1
+  image:
+    repository: catalogservice
+    tag: 0.0.1-SNAPSHOT
+    pullPolicy: IfNotPresent
+  ports:
+    - name: http
+      containerPort: 8083
+      protocol: TCP
+  sidecarPorts:
+    - containerPort: 5775
+      name: zk-compact-trft
+      protocol: UDP
+    - containerPort: 5778
+      name: config-rest
+      protocol: TCP
+    - containerPort: 6831
+      name: jg-compact-trft
+      protocol: UDP
+    - containerPort: 6832
+      name: jg-binary-trft
+      protocol: UDP
+    - containerPort: 14271
+      name: admin-http
+      protocol: TCP
+  resources:
+    requests:
+      cpu: 70m
+  livenessProbe:
+    httpGet:
+      scheme: HTTP
+      path: /catalog/actuator/health
+      port: 8083
+    initialDelaySeconds: 120
+    periodSeconds: 60
+    timeoutSeconds: 10
+    successThreshold: 1
+    failureThreshold: 3
+  readinessProbe:
+    httpGet:
+      scheme: HTTP
+      path: /catalog/actuator/health
+      port: 8083
+    initialDelaySeconds: 60
+    periodSeconds: 5
+    timeoutSeconds: 5
+    successThreshold: 1
+    failureThreshold: 10
+  dnsConfig:
+    options:
+      - name: ndots
+        value: "2"
+    nameservers:
+      - 1.1.1.1
+    searches:
+      - demo.svc.cluster.local
+      - svc.cluster.local
+      - cluster.local
+service:
+  type: NodePort
+  ports: 
+    - name: http
+      port: 8083
+      targetPort: 8083
+      protocol: TCP
+serviceAccountName: demo-deployer

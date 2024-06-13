@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "platform-basketservice.fullname" . }}
+  labels:
+    app.kubernetes.io/name: {{ include "platform-basketservice.name" . }}
+    helm.sh/chart: {{ include "platform-basketservice.chart" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+spec:
+  replicas: {{ .Values.deployment.replicaCount }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "platform-basketservice.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ include "platform-basketservice.name" . }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
+      annotations:
+        timestamp: "{{ date "20060102150405" .Release.Time }}"
+        linkerd.io/inject: enabled
+        config.linkerd.io/trace-collector: jaeger-collector-headless.observability:14250
+        config.alpha.linkerd.io/trace-collector-service-account: {{ .Values.serviceAccountName }}
+    spec:
+      serviceAccountName: {{ .Values.serviceAccountName }}
+      containers: 
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.deployment.image.repository }}:{{ .Values.deployment.image.tag }}"
+          imagePullPolicy: {{ .Values.deployment.image.pullPolicy }}
+          ports:
+{{ toYaml .Values.deployment.ports | trim | indent 12 }}
+          readinessProbe:
+{{ toYaml .Values.deployment.readinessProbe | trim | indent 12 }}
+          livenessProbe:
+{{ toYaml .Values.deployment.livenessProbe | trim | indent 12 }}
+          resources:
+{{ toYaml .Values.deployment.resources | trim | indent 12 }}
+          volumeMounts:
+          - mountPath: /service/secrets
+            name: platform-basketservice-secrets
+            readOnly: true
+        - name: jaeger-agent
+          image: jaegertracing/jaeger-agent:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+{{ toYaml .Values.deployment.sidecarPorts | trim | indent 12 }}
+          args:
+          - --reporter.grpc.host-port=dns:///jaeger-collector-headless.observability:14250
+          - --reporter.type=grpc
+        {{- if .Values.deployment.dnsConfig }}
+        - dnsConfig:
+{{ toYaml .Values.deployment.dnsConfig | indent 6 }}
+        {{- end }}
+      volumes: 
+        - name: platform-basketservice-secrets
+          secret:
+            secretName: platform-basketservice-secrets
